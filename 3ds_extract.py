@@ -40,8 +40,9 @@ if args.xorpad == None:
     if titleid == None:
         print "Could not get titleid"
         exit(-1)
-        
+   
     xorpad_filename = "%s.Main.%s.xorpad" % (titleid, args.section)
+    xorpad_filename = os.path.join(os.path.dirname(args.romfile), xorpad_filename)
     if not os.path.exists(xorpad_filename):
         print "Xorpad file %s could not be found. Please specify an xorpad file using -x." % xorpad_filename
         exit(-1)
