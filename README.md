@@ -11,7 +11,7 @@ Run 3ds_extract.py with the argument --help to see the full usage instructions.
 Example Usage
 ============
 
-python 3ds_extract.py file.3ds romfs romfs.xorpad
+python 3ds_extract.py file.3ds romfs
 
 
 Credits

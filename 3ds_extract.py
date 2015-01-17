@@ -12,6 +12,17 @@ def run_command(cmd, quiet):
         subprocess.check_call(cmd)
         
     print ""
+    
+def get_titleid(filename):
+    titleid = None
+    
+    if os.path.exists(filename):    
+        with open(filename, "rb") as file:
+            file.seek(0x108)
+            titleid_raw = file.read(8)[::-1]
+            titleid = "".join(["%02x" % ord(c) for c in titleid_raw]).upper()
+        
+    return titleid
 
 ctrtool_exe = "ctrtool.exe"
 padxorer_exe = "padxorer.exe"
@@ -19,10 +30,23 @@ padxorer_exe = "padxorer.exe"
 parser = argparse.ArgumentParser()
 parser.add_argument("romfile", type=str, help=".3ds rom file to extract data from")
 parser.add_argument("section", type=str, help="Section to extract", choices=["exefs","romfs", "exheader"])
-parser.add_argument("xorpad", type=str, help="xorpad file")
+parser.add_argument("-x", "--xorpad", type=str, default=None, help="xorpad file (Specify if it cannot be found by default)")
 parser.add_argument("-n", "--no-cleanup", action="store_true", default=False, help="Keep decrypted data file after extraction?")
 parser.add_argument("-q", "--quiet", action="store_true", default=False, help="Hide output from tools")
 args = parser.parse_args()
+
+if args.xorpad == None:
+    titleid = get_titleid(args.romfile)
+    if titleid == None:
+        print "Could not get titleid"
+        exit(-1)
+        
+    xorpad_filename = "%s.Main.%s.xorpad" % (titleid, args.section)
+    if not os.path.exists(xorpad_filename):
+        print "Xorpad file %s could not be found. Please specify an xorpad file using -x." % xorpad_filename
+        exit(-1)
+else:
+    xorpad_filename = args.xorpad
 
 rom_basename = os.path.splitext(args.romfile)[0]
 output_basename = "%s-%s" % (rom_basename, args.section)
@@ -38,8 +62,8 @@ if not os.path.exists(output_filename):
     exit(-1)
 
 # Step 2: xor data
-print "- Step 2: Xor %s with %s" % (output_filename, args.xorpad)
-exec_str = "%s %s %s" % (padxorer_exe, output_filename, args.xorpad)
+print "- Step 2: Xor %s with %s" % (output_filename, xorpad_filename)
+exec_str = "%s %s %s" % (padxorer_exe, output_filename, xorpad_filename)
 run_command(exec_str, args.quiet)
 
 if os.path.exists(output_filename):
