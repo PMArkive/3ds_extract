@@ -2,6 +2,9 @@ import argparse
 import os
 import subprocess
 
+CTRTOOL_EXE = "ctrtool.exe"
+PADXORER_EXE = "padxorer.exe"
+
 def run_command(cmd, quiet):
     print cmd
     
@@ -23,9 +26,6 @@ def get_titleid(filename):
             titleid = "".join(["%02x" % ord(c) for c in titleid_raw]).upper()
         
     return titleid
-
-ctrtool_exe = "ctrtool.exe"
-padxorer_exe = "padxorer.exe"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("romfile", type=str, help=".3ds rom file to extract data from")
@@ -55,7 +55,7 @@ output_filename = "%s.bin" % output_basename
 
 # Step 1: Extract section
 print "- Step 1: Extract %s from %s" % (args.section, args.romfile)
-exec_str = "%s -x -p --%s=%s %s" % (ctrtool_exe, args.section, output_filename, args.romfile)
+exec_str = "%s -x -p --%s=%s %s" % (CTRTOOL_EXE, args.section, output_filename, args.romfile)
 run_command(exec_str, args.quiet)
 
 if not os.path.exists(output_filename):
@@ -64,7 +64,7 @@ if not os.path.exists(output_filename):
 
 # Step 2: xor data
 print "- Step 2: Xor %s with %s" % (output_filename, xorpad_filename)
-exec_str = "%s %s %s" % (padxorer_exe, output_filename, xorpad_filename)
+exec_str = "%s %s %s" % (PADXORER_EXE, output_filename, xorpad_filename)
 run_command(exec_str, args.quiet)
 
 if os.path.exists(output_filename):
@@ -79,11 +79,11 @@ if not os.path.exists(output_decrypted_filename):
     exit(-1)
 
 if args.section == "exheader":
-    exec_str = "%s -x -t %s %s" % (ctrtool_exe, args.section, output_decrypted_filename)
+    exec_str = "%s -x -t %s %s" % (CTRTOOL_EXE, args.section, output_decrypted_filename)
 elif args.section == "exefs":
-    exec_str = "%s -x -t %s --%sdir=%s --decompresscode %s" % (ctrtool_exe, args.section, args.section, output_basename, output_decrypted_filename)
+    exec_str = "%s -x -t %s --%sdir=%s --decompresscode %s" % (CTRTOOL_EXE, args.section, args.section, output_basename, output_decrypted_filename)
 else:
-    exec_str = "%s -x -t %s --%sdir=%s %s" % (ctrtool_exe, args.section, args.section, output_basename, output_decrypted_filename)
+    exec_str = "%s -x -t %s --%sdir=%s %s" % (CTRTOOL_EXE, args.section, args.section, output_basename, output_decrypted_filename)
     
 run_command(exec_str, args.quiet)
 
