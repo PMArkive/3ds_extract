@@ -5,6 +5,10 @@ import subprocess
 CTRTOOL_EXE = "ctrtool.exe"
 PADXORER_EXE = "padxorer.exe"
 
+# Append path to 3ds_extract.py file to the target EXE tools
+CTRTOOL_EXE = os.path.join(os.path.dirname(os.path.abspath(__file__)), CTRTOOL_EXE)
+PADXORER_EXE = os.path.join(os.path.dirname(os.path.abspath(__file__)), PADXORER_EXE)
+
 def run_command(cmd, quiet):
     print cmd
     
@@ -29,11 +33,13 @@ def get_titleid(filename):
 
 parser = argparse.ArgumentParser()
 parser.add_argument("romfile", type=str, help=".3ds rom file to extract data from")
-parser.add_argument("section", type=str, help="Section to extract", choices=["exefs","romfs", "exheader"])
+parser.add_argument("-s", "--section", type=str, help="Section to extract", default="romfs", choices=["exefs","romfs", "exheader"])
 parser.add_argument("-x", "--xorpad", type=str, default=None, help="xorpad file (Specify if it cannot be found by default)")
 parser.add_argument("-n", "--no-cleanup", action="store_true", default=False, help="Keep decrypted data file after extraction?")
 parser.add_argument("-q", "--quiet", action="store_true", default=False, help="Hide output from tools")
 args = parser.parse_args()
+
+args.section = args.section.lower()
 
 if args.xorpad == None:
     titleid = get_titleid(args.romfile)
