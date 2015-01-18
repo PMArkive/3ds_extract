@@ -8,12 +8,6 @@ Use 3DS_CTR_Decryptor-VOiD to obtain xorpad file.
 Run 3ds_extract.py with the argument --help to see the full usage instructions.
 
 
-Example Usage
-============
-
-python 3ds_extract.py file.3ds romfs
-
-
 Credits
 ============
 
